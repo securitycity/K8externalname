@@ -22,7 +22,7 @@ spec:
 
         isValidPortName(ports) {
             port := ports[_]
-            split := split(port.name, "-")  // Define split here before using it
+            split := split(port.name, "-") 
             count(split) > 1
             protocol := split[0]
             protocol == "https" ; protocol == "tls"
