@@ -1,0 +1,29 @@
+apiVersion: templates.gatekeeper.sh/v1beta1
+kind: ConstraintTemplate
+metadata:
+  name: externalname-port-policy
+spec:
+  crd:
+    spec:
+      names:
+        kind: ExternalNamePortPolicy
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        package k8spolicies
+        violation[{"msg": msg}] {
+            service := input.review.object
+            service.kind == "Service"
+            service.spec.type == "ExternalName"
+            not isValidPortName(service.spec.ports)
+            msg := sprintf("ExternalName service %v contains an invalid port name", [service.metadata.name])
+
+        }
+
+        isValidPortName(ports) {
+            port := ports[_]
+            split := split(port.name, "-")
+            count(split) > 1
+            protocol := split[0]
+            protocol == "https" ; protocol == "tls"
+        }
